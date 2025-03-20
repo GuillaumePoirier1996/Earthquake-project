@@ -1,0 +1,12 @@
+name: seisme_projet_serie
+title: seisme_projet_serie
+username: davyd-bayard
+account: davyd-bayard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 10879707
+bundleId: 8117828
+url: https://davyd-bayard.shinyapps.io/seisme_projet_serie/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
