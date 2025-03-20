@@ -1,0 +1,27 @@
+\contentsline {chapter}{\numberline {1}Introduction}{2}{}%
+\contentsline {section}{\numberline {1.1}Contexte}{2}{}%
+\contentsline {section}{\numberline {1.2}Objectifs}{2}{}%
+\contentsline {chapter}{\numberline {2}Analyse des Données Géologiques}{4}{}%
+\contentsline {section}{\numberline {2.1}Les phénomènes sismiques}{4}{}%
+\contentsline {section}{\numberline {2.2}Les méthodes de mesures d'amplitudes}{5}{}%
+\contentsline {subsection}{\numberline {2.2.1}Magnitude locale \(M_L\)}{5}{}%
+\contentsline {subsection}{\numberline {2.2.2}Magnitudes dites d'ondes \(m_b\) et \(M_S\)}{5}{}%
+\contentsline {subsection}{\numberline {2.2.3}Magnitude des Moments}{6}{}%
+\contentsline {section}{\numberline {2.3}Collecte des données}{7}{}%
+\contentsline {section}{\numberline {2.4}Prétraitement des données}{8}{}%
+\contentsline {subsection}{\numberline {2.4.1}Nettoyage des données}{8}{}%
+\contentsline {subsection}{\numberline {2.4.2}Conversion des horodatages}{8}{}%
+\contentsline {chapter}{\numberline {3}Analyse descriptive}{9}{}%
+\contentsline {section}{\numberline {3.1}Magnitude moyenne et médiane sur différentes périodes}{9}{}%
+\contentsline {section}{\numberline {3.2}Cartographie des séismes}{9}{}%
+\contentsline {section}{\numberline {3.3}Nombre de séisme par année / par endroit}{10}{}%
+\contentsline {section}{\numberline {3.4}Les séismes les plus importants}{10}{}%
+\contentsline {chapter}{\numberline {4}Choix du sujet}{11}{}%
+\contentsline {section}{\numberline {4.1}Les essais}{11}{}%
+\contentsline {section}{\numberline {4.2}Choix retenu}{11}{}%
+\contentsline {chapter}{\numberline {5}Modélisation}{12}{}%
+\contentsline {section}{\numberline {5.1}ARIMA}{12}{}%
+\contentsline {section}{\numberline {5.2}GARCH}{12}{}%
+\contentsline {section}{\numberline {5.3}LightGBM}{12}{}%
+\contentsline {section}{\numberline {5.4}LSTM}{12}{}%
+\contentsline {chapter}{\numberline {6}Conclusion}{13}{}%

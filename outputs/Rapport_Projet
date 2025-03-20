@@ -1,0 +1,382 @@
+\documentclass{report}
+% Package pour le paramètrage des figures
+\usepackage{graphicx}
+% Package pour le paramètrage des paragraphes
+\usepackage{parskip}
+
+% Package et/pour définition des marges
+\usepackage[left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+
+% Traduction de toutes les parties du document
+\renewcommand*\abstractname{Résumé}
+\renewcommand*\chaptername{Partie}
+\renewcommand*\sectionname{Section}
+\renewcommand*\subsectionname{Sous-section}
+\renewcommand*\subsubsectionname{Sous-sous-section}
+\renewcommand*\bibname{Bibliographie}
+\renewcommand*\contentsname{Table des matières}
+\renewcommand*\listfigurename{Liste des figures}
+\renewcommand*\listtablename{Liste des tableaux}
+
+% Parametrage de l'inter-paragraphe et du retrait
+% de la première ligne du paragraphe
+\setlength{\parskip}{10pt}
+\setlength{\parindent}{20pt}
+
+% Parametrage de la numérotation des figures à partir de 1
+\makeatletter
+\renewcommand{\thefigure}{\@arabic\c@figure} %
+\makeatother
+
+%Création du titre, de l'auteur etc
+\title{Projet Séries temporelles - Analyse des Données Géologiques}
+\author{Guillaume POIRIER, Davyd BAYARD}
+\date{29/12/2023}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    Ceci est un résumé du projet.
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introduction}
+\section{Contexte}
+
+L'analyse géologique, englobant l'activité sismique et les éruptions volcaniques, joue un rôle crucial dans la compréhension des intrications des processus géologiques de la Terre et, plus essentiellement, dans la prédiction d'événements futurs. À une époque marquée par les avancées technologiques et une sensibilisation mondiale accrue, l'analyse de ces données émerge comme une pierre angulaire dans la préparation et l'anticipation des catastrophes. Ce rapport se plonge dans les méthodologies utilisées pour scruter les données géologiques en séries temporelles, visant non seulement à comprendre les tendances historiques, mais aussi à prévoir des événements sismiques potentiels. La signification de cette entreprise réside dans son potentiel à sauver des vies et à protéger les biens en permettant des actions rapides et informées.
+
+Les données géologiques proviennent exclusivement du Service Géologique des États-Unis (USGS). La stratégie open-data clairement affichée fournie une base complète pour l'analyse. Le périmètre de l'étude choisi concerne les tremblements de terre à l'échelle mondiale survenus depuis 1990.
+
+Les sections suivantes de ce rapport décrivent l'approche systématique pour traiter les données géologiques en séries temporelles, depuis la prétraitement et l'analyse exploratoire des données jusqu'à la sélection du modèle et la prédiction d'événements.
+
+\section{Objectifs}
+
+Dans une phase préliminaire, l'objectif consiste à acquérir une compréhension, à observer et à constater en vue de partager une première analyse des données. L'importance accordée au prétraitement des données se justifie par le constat que les connaissances spécialisées dans le domaine des activités sismiques ne sont pas universellement répandues. Cette étape s'avère être une véritable aculturation.
+
+Par la suite, la deuxième phase consistera à procéder au nettoyage, à la transformation et à l'enrichissement des données. Étant donné que la collecte se fait dans un format public, des ajustements sont nécessaires pour préparer les données en vue de la modélisation.
+
+Il existe une diversité de choix pour la sélection des variables à modéliser. Ce rapport va exhaustivement décrire nos différentes tentatives de modélisation, aboutissant à notre sujet principal, à savoir la modélisation du nombre de séismes par mois en Alaska.
+
+La modélisation constituera en elle-même une étape significative de ce rapport. Divers modèles seront testés et détaillés. Dans une démarche logique, cette étape sera suivie d'une validation du modèle et de l'évaluation de ses performances, incluant des considérations sur l'explicabilité.
+
+L'objectif ultime de ce processus est le développement de systèmes d'alerte précoce, robustes, capables d'avertir les autorités et les communautés pertinentes dès la détection d'événements géologiques potentiel fréquent sur le mois.
+
+\chapter{Analyse des Données Géologiques}
+\section{Les phénomènes sismiques}
+
+D'après une définition donnée sur wikipédia \cite{def_seisme}, un séisme ou tremblement de terre est une secousse du sol résultant de la libération brusque d'énergie accumulée par les contraintes exercées sur les roches. Cette libération d'énergie se fait par rupture le long d'une faille, généralement préexistante. Plus rares sont les séismes dus à l'activité volcanique ou d'origine artificielle (explosions par exemple). Le lieu de la rupture des roches en profondeur se nomme le foyer ; la projection du foyer à la surface est l'épicentre du séisme. Le mouvement des roches près du foyer engendre des vibrations élastiques qui se propagent, sous la forme de paquets d'ondes sismiques, autour et au travers du globe terrestre. Il produit aussi un dégagement de chaleur par frottement, au point de parfois fondre les roches le long de la faille (pseudotachylites).
+
+La prédominance des séismes se manifeste principalement aux confins des plaques tectoniques, donnant lieu aux séismes inter-plaques. Toutefois, des événements sismiques peuvent également survenir à l'intérieur des plaques, caractérisés comme des séismes intra-plaques. L'explication adéquate de la répartition des ceintures de sismicité à la surface de la Terre réside dans le concept de tectonique des plaques. Les principales ceintures sismiques mondiales, définies par la concentration géographique des activités sismiques, comprennent la ceinture de feu du Pacifique, libérant annuellement 80 \% de l'énergie sismique, la ceinture alpine contribuant à hauteur de 15 \% de l'énergie annuelle, ainsi que les dorsales océaniques, responsables de 5 \% de l'énergie sismique annuelle.
+
+Ci-dessous se trouve un schéma illustrant la dynamique des séismes inter-plaques, incorporant également une explication claire des concepts tels que le foyer, l'épicentre et les ondes sismiques.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=1.8]{images/Schema_explicatif_seisme_interplaque.jpg}
+%     \caption{Schéma d'un séisme inter-plaques.\\Source: https://www.researchgate.net/figure/Schema-dun-seisme-17_fig1_345039842}
+%     \label{fig:Schéma_explicatif_1}
+% \end{figure}
+%
+% \vspace{\baselineskip}
+
+Les séismes intra-plaques se produisent à l'intérieur d'une seule plaque tectonique, constituant une forme rare d'activité sismique en contraste avec les séismes inter-plaques, plus fréquents, qui résultent de l'interaction entre au moins deux plaques tectoniques. Bien que moins fréquents, les séismes intra-plaques peuvent avoir des conséquences dévastatrices en raison du manque d'infrastructures parasismiques coûteuses dans des zones généralement considérées comme peu susceptibles de subir de tels événements.
+
+Ces séismes intra-plaques se déroulent principalement dans la partie supérieure de la croûte terrestre et peuvent être classés en deux catégories distinctes : le champ de contraintes régional et le champ de contrainte local, chacun capable de déclencher un séisme. Dans le premier cas, les contraintes globales de la plaque sont uniformes sur sa surface, libérant ainsi l'énergie accumulée dans des failles préexistantes, telles que celles héritées de la dislocation de Pangée. Quant au champ de contrainte local, il concentre l'énergie en un point spécifique, générant ainsi un séisme. Les mécanismes explicatifs de ce dernier cas sont encore incompris, mais deux hypothèses sont en compétition : le modèle de faible force, qui postule que les contraintes se situent dans des zones de faible viscosité, rendant ainsi la croûte plus « cassante », et l'hypothèse de l'entraînement basal, basée sur les courants de convection descendant du manteau qui emportent la croûte avec eux. Dans tous les scénarios, la présence de failles est un prérequis essentiel.
+
+Il est également important de noter que des interactions avec des séismes inter-plaques sont possibles, où l'un peut déclencher l'autre. Un exemple notable est le séisme de 2009 aux Samoa, où un séisme intra-plaque a provoqué deux séismes de subduction.
+
+\section{Les méthodes de mesures d'amplitudes}
+
+Les méthodes de mesure des séismes abordées dans la suite proviennent des références \cite{wiki_sismo} et \cite{mes_magn_mom}. Chacune de ces approches vise à quantifier la puissance du phénomène sismique dans les trois cas présentés.
+
+\subsection{Magnitude locale \(M_L\)}
+
+La première évaluation de la magnitude a été introduite en 1935 par Charles Francis Richter pour classer les sismogrammes locaux enregistrés en Californie. Initialement conçue pour mesurer l'amplitude en micromètres sur un sismographe de type Wood-Anderson pour un séisme situé à 100 km, cette mesure est maintenant appelée magnitude locale.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=1.8]{images/echelle_de_richter.jpg}
+%     \caption{Echelle de Richter.\\Source: https://www.assistancescolaire.com/enseignant/college/ressources/base-documentaire-en-sciences/a0410\_00004\_bd}
+%     \label{fig:echelle_richter}
+% \end{figure}
+%
+% \vspace{\baselineskip}
+
+La magnitude de Richter est déterminée en mesurant l'amplitude maximale des ondes sismiques enregistrées par des sismographes. L'amplitude est ensuite ajustée en fonction de la distance entre la source du séisme (l'épicentre) et la station sismique. L'idée fondamentale est que plus un séisme est énergétique, plus les ondes sismiques enregistrées seront importantes.
+
+La formule originale de Richter pour la magnitude locale (\(M_L\)) est une échelle logarithmique simple :
+\( M_L = \log(A) - \log(A_0) + c \times \log(\Delta) \)
+
+\begin{itemize}
+  \item \(A\) représente l'amplitude maximale,
+  \item \(A_0\) est une amplitude de référence pour un séisme de magnitude 0 à 100 km,
+  \item \(\Delta\) est la distance épicentrale,
+  \item \(c\) est une constante d'étalonnage.
+\end{itemize}
+
+Les constantes d'étalonnage rendent cette définition valide localement, soulignant son caractère empirique. Par exemple, dans la définition originale pour des séismes modérés en Californie du Sud, enregistrés avec un sismographe de type Wood-Anderson,
+\(c = 2.76\) et \(\log(A_0) = 2.48\).
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=4.0]{images/Ondes_sismiques_richter.jpg}
+%     \caption{Description de la mesure d'amplitude, avec Richter.\\Source: https://fr.wikipedia.org/wiki/Echelle\_de\_Richter}
+%     \label{fig:Ondes_sismiques_richter}
+% \end{figure}
+%
+% \vspace{\baselineskip}
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=4.0]{images/schema_dist_epi.jpg}
+%     \caption{Présentation de la distance epicentrale.\\Source: https://www.azurseisme.com/Glossaire.html}
+%     \label{fig:Ondes_sismiques_richter}
+% \end{figure}
+%
+% \vspace{\baselineskip}
+
+La magnitude de Richter est déterminée en mesurant l'amplitude maximale des ondes sismiques enregistrées par des sismographes. L'amplitude est ensuite ajustée en fonction de la distance entre la source du séisme (l'épicentre) et la station sismique. L'idée fondamentale est que plus un séisme est énergétique, plus les ondes sismiques enregistrées seront importantes.
+
+\subsection{Magnitudes dites d'ondes \(m_b\) et \(M_S\)}
+
+L'échelle de Richter, une mesure locale introduite en 1936, a conduit à l'émergence d'une nouvelle magnitude appelée \(M_S\) (magnitude des ondes de surface). Proposée par Beno Gutenberg et Charles Richter, cette magnitude se base sur l'amplitude des ondes de surface, en particulier l'onde de Rayleigh sur la composante verticale du sismogramme, pour des distances télésismiques (au-delà de 30°) et une période de 20 secondes (période naturelle des sismographes). La formulation de cette magnitude est similaire à celle de la magnitude locale (\(M_L\)) :
+
+\( M_S = \log(A_{20}) + b + c \times \log(\Delta) \)
+
+\begin{itemize}
+  \item \(A_{20}\) est l'amplitude mesurée,
+  \item \(\Delta\) est la distance épicentrale en degrés,
+  \item \(b\) et \(c\) sont des constantes d'étalonnage.
+\end{itemize}
+
+Malgré son caractère empirique et les problèmes de saturation, cette mesure est toujours utilisée aujourd'hui. Cependant, elle présente des limitations pour les séismes profonds (profondeur supérieure à 100 km) et pour l'estimation rapide de la magnitude dans le cadre d'un réseau d'alerte.
+
+La magnitude des ondes de volume, notée \(mb\) (b pour « body waves »), a été introduite en 1956. Elle se base sur le premier train d'onde P, offrant une estimation rapide de l'importance du séisme. Sa formulation dépend de la période dominante \(T\) du signal :
+
+\( m_b = \log(A/T) + Q(\Delta, h) \)
+
+\begin{itemize}
+  \item \(A\) est l'amplitude maximale mesurée,
+  \item \(\Delta\) est la distance épicentrale en degrés,
+  \item \(h\) est la profondeur hypocentrale,
+  \item \(Q\) est une fonction d'étalonnage dépendant de ces paramètres.
+\end{itemize}
+
+Cependant, cette mesure présente également des problèmes de saturation rapide avec la magnitude.
+
+D'autres magnitudes sont utilisées à l'échelle locale ou régionale, telles que la magnitude de durée, basée sur la mesure de la durée en secondes du signal sur le sismogramme. La variabilité de ces mesures, due à divers facteurs tels que le type d'onde, le capteur utilisé, la distance et le type de magnitude, explique la difficulté à établir des relations précises entre elles.
+
+\subsection{Magnitude des Moments}
+
+En 1979, Thomas Hanks et Hiroo Kanamori, chercheurs au Caltech en Californie, ont introduit une nouvelle méthode de calcul de la magnitude des séismes, appelée Mw ou magnitude de moment.
+
+Cette approche repose sur le modèle physique de la rupture d'un séisme, prenant en compte la déformation élastique associée à un double-couple de forces de directions opposées et perpendiculaires. Le moment sismique (\(M_0\)), exprimé en Newton.mètres (N.m), est une mesure de l'énergie sismique liée au déplacement sur la faille.
+
+La magnitude \(M_w\) est calculée à partir du moment sismique selon la formule :
+
+\[ M_w = \frac{3}{2} \cdot (\log_{10} M_0 - 9.1) \]
+
+Où \(M_0\) est exprimé en N.m. Par exemple, un séisme de magnitude \(M_w \approx 6\) correspond à un moment sismique \(M_0 \approx 10^{18}\) N.m.
+
+Le moment sismique \(M_0\) est défini comme :
+
+\[ M_0 = \mu \cdot S \cdot \Delta u \]
+
+Où :
+
+\begin{itemize}
+    \item \(\mu\) est le module de cisaillement, varie entre 30 GPa et 300 GPa dans la Terre.
+    \item \(S\) est la surface de la faille, calculée à partir de la longueur de la faille \(L\), du pendage de la faille \(p\), et de la profondeur de la faille \(z\).
+    \item \(\Delta u\) est le déplacement moyen sur la faille.
+\end{itemize}
+
+Cette approche permet une meilleure évaluation de la magnitude des gros séismes en prenant en compte la répartition temporelle de l'énergie libérée. La contrainte inhérente à cette méthode réside dans l'impératif de présence d'une faille. Ainsi, son efficacité maximale est atteinte uniquement dans le contexte de phénomènes sismiques d'une magnitude significative.
+
+\section{Collecte des données}
+
+Comme précédemment indiqué, les données ont été recueillies à partir du site de l'USGS, un organisme chargé de la surveillance mondiale de la Terre et mettant à disposition une base de données gratuite. C'est une exposition de l'ensemble des informations provenant des laboratoires de surveillances de la terre, rassemblé et mis en commun dans un seul et même endroit. Afin de gérer le volume important de données, le jeu de données présenté et analysé dans la suite du rapport résulte de multiples requêtes jointes.
+
+Il est important de noter l'absence de filtrage des données. Tous les tremblements de terre, survenus à l'échelle mondiale de 1990 à aujourd'hui, sont pris en considération. Une rapide description des colonnes importantes est présenté ci-dessous :
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|l|p{10.2cm}|}
+        \hline
+        \textbf{Champ} & \textbf{Format} & \textbf{Description} \\
+        \hline
+        time & Long Integer & Temps de l'événement en millisecondes depuis l'époque (1970-01-01T00:00:00.000Z), sans inclure les secondes intercalaires. Dans certains formats de sortie, la date est formatée pour la lisibilité. \\
+        \hline
+        place & String & Description textuelle de la région géographique nommée près de l'événement. Il peut s'agir du nom d'une ville ou d'une région de la classification de Flinn-Engdahl. \\
+        \hline
+        status & String & Indique si l'événement a été examiné par un être humain. \\
+        \hline
+        tsunami & Integer & Il s'agit d'une série de grandes vagues océaniques généralement causées par une perturbation sous-marine, souvent associée à des tremblements de terre. \\
+        \hline
+        significance & Integer & Indique l'importance ou le niveau d'impact de l'événement, qui peut être utilisé pour évaluer les conséquences potentielles. \\
+        \hline
+        data\_type & String & Type d'événement sismique. \\
+        \hline
+        magnitudo & Decimal & Magnitude de l'événement. \\
+        \hline
+        state & String & Représente la division administrative ou l'État où l'événement s'est produit, souvent applicable à des pays spécifiques. \\
+        \hline
+        latitude / longitude & Decimal & Degrés décimaux de latitude. Valeurs négatives pour les latitudes sud, et degrés décimaux de longitude. Valeurs négatives pour les longitudes ouest. \\
+        \hline
+        depth & Decimal & Profondeur de l'événement en kilomètres. \\
+        \hline
+        date & String & Date et heure de l'évènement \\
+        \hline
+    \end{tabular}
+    \caption{Description des champs des données sur les séismes.}
+    \label{tab:seismic_data}
+\end{table}
+
+Voici une présentation des premières lignes de notre jeu de données :
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=5.0]{images/head_df_geol.png}
+%     \caption{En-tête du DataFrame.}
+%     \label{fig:head_data}
+% \end{figure}
+%
+% \vspace{\baselineskip}
+
+\section{Prétraitement des données}
+\subsection{Nettoyage des données}
+
+Initialement, nous avons procédé à une vérification de l'intégralité des données relatives aux variables sélectionnées. Heureusement, aucune donnée n'était manquante, attestant ainsi de la haute qualité des données.
+
+Dans une étape subséquente, nous avons examiné la présence éventuelle de doublons. En raison de la nature de plusieurs requêtes associées, nous avons identifié 16869 lignes en double sur un total de 3445751. Par conséquent, un processus de dédoublonnage a été effectué au stade de prétraitement.
+
+\subsection{Conversion des horodatages}
+
+Initialement, étant donné que la variable "time" était exprimée en timestamp, la décision initiale était de laisser les données telles quelles, le format en millisecondes étant couramment utilisé pour les séries temporelles. Cependant, après des tentatives de modélisation répétées, une conversion a été réalisée. Cette conversion a impliqué le passage du format entier (timestamp en millisecondes) à un format de date. Cette modification a été motivée par la décision ultérieure d'agréger les données par mois. En conséquence, la cible et l'objectif du projet ont été modifiés pour refléter cette nouvelle approche.
+
+\chapter{Analyse descriptive}
+\section{Magnitude moyenne et médiane sur différentes périodes}
+
+En utilisant le package ggplot2, il est possible de générer une représentation graphique claire des magnitudes annuelles, incluant à la fois la moyenne et la médiane. Cette visualisation permet d'observer une tendance globale, évaluant ainsi la possible corrélation entre ce phénomène naturel et les changements climatiques. Une analyse préliminaire indique cependant qu'aucune relation significative n'est observée.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=4.0]{images/mag_moy_an.png}
+%     \caption{Magnitudes par an.}
+%     \label{fig:mag_moy_an}
+% \end{figure}
+%
+% \vspace{\baselineskip}
+%
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=4.0]{images/bplt_mag_an.png}
+%     \caption{Box Plot des magnitudes par an.}
+%     \label{fig:bplt_mag_an}
+% \end{figure}
+
+Cette analyse englobe les données depuis 1990, présentant une perspective sur une période étendue. Ce qui est notable ici, c'est l'absence apparente de saisonnalité, mais plutôt une volatilité significative au sein de la série chronologique. Par ailleurs, il est observé que la magnitude moyenne annuelle des tremblements de terre ne manifeste pas de tendance à la hausse. Par conséquent, à première vue, aucune conclusion ne peut être tirée quant à un éventuel lien avec le réchauffement climatique.
+
+Les diagrammes en boîte fournissent des informations cruciales sur la magnitude moyenne annuelle, tout en mettant en évidence la présence de nombreux tremblements de terre très puissants, qui sont largement ressentis par les êtres humains. C'est encore plus complexe, à mon sens, de dégager une réelle évolution sur le temps.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=4.0]{images/mag_moy_mois.png}
+%     \caption{Magnitudes par mois.}
+%     \label{fig:mag_moy_mois}
+% \end{figure}
+
+\vspace{\baselineskip}
+
+Ici, pas de saisonnalité non plus. En revanche, une tendance nettement plus stable se manifeste, conformément à nos attentes.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=4.0]{images/occ_tr_an.png}
+%     \caption{Occurences des tremblements par an.}
+%     \label{fig:occ_tr_an}
+% \end{figure}
+%
+% \vspace{\baselineskip}
+
+L'année 2023 ne doit pas être prise en considération, car le dataframe s'arrête en juillet. Contrairement à la magnitude, une tendance claire se dégage en termes de fréquence de tremblements, montrant une augmentation au fil des années. Ainsi, pour résumer, il n'y a pas d'augmentation moyenne de la magnitude, mais une fréquence croissante d'apparition de séismes, indiquant une augmentation du nombre de séismes, principalement de faible intensité.
+
+\section{Cartographie des séismes}
+
+Cette section fournira une brève analyse des emplacements fortement affectés par les séismes.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=4.0]{images/top10_lieu_tr.png}
+%     \caption{Lieux les plus frappés par les séismes}
+%     \label{fig:top10_lieu_tr}
+% \end{figure}
+
+\vspace{\baselineskip}
+
+On voit tout de suite deux pays clairement émerger : la Californie et l'Alaska. C'est sur ce dernier que notre modélisation portera. Les emplacements sont particulièrement spécifiques, avec des variables représentées de manière précise. Il est logique de regrouper ces données par pays afin d'observer des catégories plus générales.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=4.0]{images/20_etats_plus_tr.png}
+%     \caption{Pays les plus touchés}
+%     \label{fig:etats_plus_tr}
+% \end{figure}
+
+La Californie et l'Alaska se démarquent clairement en occupant les premières positions. Bien que le Nevada et Hawaï figurent respectivement en 3ème et 4ème place, leur nombre de séismes est significativement inférieur en comparaison.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=4.0]{images/Carte_Seisme_Monde.jpeg}
+%     \caption{Planisphère complet}
+%     \label{fig:crt_seisme_monde}
+% \end{figure}
+
+Avec le planisphère, ce qui est interessant, c'est que l'on observe clairement, avec les séisme dans le monde depuis 1990, la forme des plaque techtoniques. En réalité, on peut dessiner ou avoir une idée assez précise de la localisation des failles dans le monde, grâce à la lattitude et à la longitude de chaque séisme. On remarque aussi que l'on a clairement une grande concentration des tremblements dans les zones montagneuse des Etats-Unis et plus haut sur l'Alaska.
+
+\section{Nombre de séisme par année / par endroit}
+\section{Les séismes les plus importants}
+
+magnitudes
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+   0.00   13.00   33.00   74.01   81.00 2910.00
+\chapter{Choix du sujet}
+
+\section{Les essais}
+\section{Choix retenu}
+
+\chapter{Modélisation}
+
+\section{ARIMA}
+\section{GARCH}
+\section{LightGBM}
+\section{LSTM}
+
+\chapter{Conclusion}
+
+\listoffigures  % Table des figures
+
+\begin{thebibliography}{50}
+    \bibitem{def_seisme}
+    \textit{Séisme}.
+    Wikipédia.
+    Disponible à : \url{https://fr.wikipedia.org/wiki/Séisme}.
+    Consulté le : Date de consultation (06/01/2024).
+
+    \bibitem{wiki_sismo}
+    \textit{Magnitude (Sismologie}.
+    Wikipédia.
+    Disponible à : \url{https://fr.wikipedia.org/wiki/Magnitude\_(sismologie)}.
+    Consulté le : Date de consultation (07/01/2024).
+
+    \bibitem{mes_magn_mom}
+    \textit{Magnitude de moment}.
+    Musée de sismologie.
+    Disponible à : \url{https://musee-sismologie.unistra.fr/comprendre-les-seismes/notions-pour-petits-et-grands/la-sismicite/la-magnitude-mw-et-le-moment-sismique/#:~:text=On\%20peut\%20la\%20calculer\%20\%C3\%A0,ne\%20touche\%20pas\%20la\%20surface.}.
+    Consulté le : Date de consultation (07/01/2024).
+\end{thebibliography}
+
+
+\end{document}
